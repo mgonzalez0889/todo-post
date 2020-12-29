@@ -1,4 +1,7 @@
 import { Component } from '@angular/core';
+import {Store, Select} from '@ngxs/store';
+import {AddName, BogotaAction, } from '../state/bogota.actions';
+import {Observable} from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -6,5 +9,15 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  title = 'ngxs';
+  title = 'Charla Angular';
+  name = 'Aprendiendo Ngxs';
+
+
+  constructor(private store: Store) {
+    //store.dispatch(new BogotaAction(this.title)).subscribe( res => console.log(res));
+    //store.dispatch(new AddName(this.name)).subscribe( res => console.log() );
+  }
+
+
+
 }
