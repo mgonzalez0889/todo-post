@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import {Observable} from 'rxjs';
 import {Posts} from '../../state/post/posts.model';
-import {Store} from '@ngxs/store';
+import {Select, Store} from '@ngxs/store';
 import {posts} from '../../state/post/posts.actions';
+import {PostsState} from '../../state/post/posts.state';
 
 @Component({
   selector: 'app-listar-posts',
@@ -11,10 +12,9 @@ import {posts} from '../../state/post/posts.actions';
 })
 export class ListarPostsComponent implements OnInit {
 
-  public posts: Observable<Posts>;
-
+  @Select(PostsState.getPosts) posts$: Observable<Posts[]>;
   constructor(private store: Store) {
-    this.posts = this.store.select(state => state.posts.posts);
+
   }
 
   ngOnInit(): void {
@@ -22,6 +22,10 @@ export class ListarPostsComponent implements OnInit {
 
   public removePost(id: string) {
     this.store.dispatch(new posts.RemovePost(id));
+  }
+
+  public selectPost(post: Posts) {
+    this.store.dispatch(new posts.SelectPost(post, true));
   }
 
 }

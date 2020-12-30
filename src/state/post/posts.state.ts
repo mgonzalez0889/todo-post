@@ -1,36 +1,96 @@
 import { State, Action, StateContext, Selector } from '@ngxs/store';
-import { PostsStateModel } from './posts.model';
+import {Posts} from './posts.model';
 import { posts } from './posts.actions';
+import {patch, updateItem} from '@ngxs/store/operators';
+
+
+export class PostsStateModel{
+  items: Posts[];
+  selectedItem: Posts;
+}
+
+const defaults = {
+  items: [],
+  selectedItem: undefined
+};
 
 @State({
   name: 'posts',
-  defaults: {
-    posts: []
-  }
+  defaults
 })
 
 export class PostsState{
-  @Selector() static getPosts(state: PostsStateModel){
-    return state.posts;
+
+  /**
+   * @description: Select Posts
+   */
+  @Selector()
+  static getPosts(state: PostsStateModel){
+    return state.items;
   }
 
-  // Añade un nuevo post al estado
+  /**
+   * @description: Select post
+   */
+  @Selector()
+  static getPost(state: PostsStateModel) {
+    return state.selectedItem;
+  }
+
+  /**
+   * @description: Add Post
+   */
   @Action(posts.AddPosts)
   add({getState, patchState}: StateContext<PostsStateModel>, { payload}: posts.AddPosts) {
     const state = getState();
     patchState({
-      posts: [...state.posts, payload]
+      items: [...state.items, payload]
     });
   }
 
-  // Elimina un post del estado
+  /**
+   * @description: Remove Post
+   */
   @Action(posts.RemovePost)
-  remove({getState, patchState}: StateContext<PostsStateModel>, { payload}: posts.RemovePost ){
+  remove(
+    {
+      getState,
+      patchState
+    }: StateContext<PostsStateModel>,
+    { payload}: posts.RemovePost ){
     patchState({
-      posts: getState().posts.filter(post => post.id !== payload)
+      items: getState().items.filter(post => post.id !== payload)
     });
   }
 
-
+  /**
+   * @description: Edit Post
+   */
+  @Action(posts.EditPost)
+  editPost(
+    ctx: StateContext<PostsStateModel>,
+    action: posts.EditPost
+  ) {
+    ctx.setState(
+      patch<PostsStateModel>({
+        items: updateItem<Posts>(f => f.id === action.payload.id, patch<Posts>(action.payload)),
+        selectedItem: undefined
+      })
+    );
+  }
+  /**
+   * @description: Select Post
+   */
+  @Action(posts.SelectPost)
+  selectItem(
+    ctx: StateContext<PostsStateModel>,
+    action: posts.SelectPost
+  ){
+    const state = ctx.getState();
+    ctx.setState({
+      ...state,
+      selectedItem: action.payload
+    });
+  }
 
 }
